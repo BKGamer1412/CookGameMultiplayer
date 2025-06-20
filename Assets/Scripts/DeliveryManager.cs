@@ -1,0 +1,114 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DeliveryManager : MonoBehaviour
+{
+    public event EventHandler OnRecipeSpawned;
+    public event EventHandler OnRecipeCompleted;
+    public event EventHandler OnRecipeSuccess;
+    public event EventHandler OnRecipeFailed;
+
+    public static DeliveryManager Instance { get; private set; }
+    [SerializeField] private RecipeListSO recipeListSO;
+    private List<RecipeSO> waitingRecipeSOList;
+
+    private float spawnRecipeTimer;
+    private float spawnRecipeTimerMax = 4f;
+    private int waitingRecipeSOMax = 4;
+    private int recipeDeliveredCount;
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Debug.LogError("There is more than one Delivery Manager instance in the scene!");
+        }
+        Instance = this;
+
+        waitingRecipeSOList = new List<RecipeSO>();
+    }
+    private void Update()
+    {
+        //waiting recipe algorithm
+        spawnRecipeTimer -= Time.deltaTime;
+
+        if (spawnRecipeTimer <= 0f)
+        {
+            spawnRecipeTimer = spawnRecipeTimerMax;
+
+            if (KitchenGameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitingRecipeSOMax)
+            {
+                RecipeSO waitingRecipeSO = recipeListSO.recipeSOList[UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count)];
+                waitingRecipeSOList.Add(waitingRecipeSO);
+
+                OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
+    public void DeliverRecipe(PlateKitchenObject plateKitchenObject)
+    {
+        for (int i = 0; i < waitingRecipeSOList.Count; i++)
+        {
+            RecipeSO recipeSO = waitingRecipeSOList[i];
+
+            if (recipeSO.kitchenObjectSOList.Count == plateKitchenObject.GetKitchenObjectSOList().Count)
+            {
+                //match ingredients amount
+                bool plateContainMatchedRecipe = true;
+
+                foreach (KitchenObjectSO recipeKitchenObjectSO in recipeSO.kitchenObjectSOList)
+                {
+                    bool ingredientFound = false;
+                    //cycling through ingredients in recipe
+                    foreach (KitchenObjectSO plateKitchenObjectSO in plateKitchenObject.GetKitchenObjectSOList())
+                    {
+                        //cycling through ingredients in plate
+                        if (recipeKitchenObjectSO == plateKitchenObjectSO)
+                        {
+                            //match ingredient
+                            ingredientFound = true;
+                            break;
+                        }
+
+                    }
+
+                    if (!ingredientFound)
+                    {
+                        //this recipe ingredients not found on plate
+                        plateContainMatchedRecipe = false;
+                    }
+                }
+
+                if (plateContainMatchedRecipe)
+                {
+                    //match recipe
+                    recipeDeliveredCount++;
+                    waitingRecipeSOList.RemoveAt(i);
+
+                    OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+                    OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
+
+                    return;
+                }
+
+            }
+        }
+
+        //no matched recipes
+        //player did not deliver the correct recipe
+        OnRecipeFailed?.Invoke(this, EventArgs.Empty);
+    }
+
+    public List<RecipeSO> GetWaitingRecipeSOList()
+    {
+        return waitingRecipeSOList;
+    }
+
+    public int GetRecipeDeliveredCount()
+    {
+        return recipeDeliveredCount;
+    }
+}
