@@ -31,7 +31,7 @@ public class GameInput : MonoBehaviour
         Instance = this;
         playerInputActions = new PlayerInputActions(); //focus this
         
-        //if old input exists, after construct and before enable
+        //if old input exists override it to current (place after construct and before enable)
         if (PlayerPrefs.HasKey(PLAYER_PREFS_BINDINGS))
         {
             playerInputActions.LoadBindingOverridesFromJson(PlayerPrefs.GetString(PLAYER_PREFS_BINDINGS));

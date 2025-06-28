@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class GamePlayingClockUI : MonoBehaviour
 {
-    [SerializeField] Image timerImage;
+    [SerializeField] private Image timerImage;
 
     private void Update()
     {

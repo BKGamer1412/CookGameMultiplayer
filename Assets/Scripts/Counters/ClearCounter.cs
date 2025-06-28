@@ -36,7 +36,8 @@ public class ClearCounter : BaseCounter
                     //player hold a plate
                     if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO()))
                     {
-                        GetKitchenObject().DestroySelf();
+                        // GetKitchenObject().DestroySelf();
+                        KitchenObject.DestroyKitchenObject(GetKitchenObject());
                     }
                 }
                 else
@@ -47,7 +48,8 @@ public class ClearCounter : BaseCounter
                         //there a plate on counter
                         if (plateKitchenObject.TryAddIngredient(player.GetKitchenObject().GetKitchenObjectSO()))
                         {
-                            player.GetKitchenObject().DestroySelf();
+                            // player.GetKitchenObject().DestroySelf();
+                            KitchenObject.DestroyKitchenObject(player.GetKitchenObject());
                         }
 
                     }

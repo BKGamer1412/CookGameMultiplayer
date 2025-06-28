@@ -9,8 +9,25 @@ public class SelectedCounterVisual : MonoBehaviour
     [SerializeField] private GameObject[] visualGameObjectArray;
     private void Start()
     {
-        PlayerController.Instance.OnSelectedCounterChanged += PlayerController_OnSelectedCounterChanged;
+        if (PlayerController.LocalInstance != null)
+        {
+            PlayerController.LocalInstance.OnSelectedCounterChanged += PlayerController_OnSelectedCounterChanged;
+        }
+        else
+        {
+            PlayerController.OnAnyPlayerSpawned += PlayerController_OnAnyPlayerSpawned;
+        }
 
+    }
+
+    private void PlayerController_OnAnyPlayerSpawned(object sender, EventArgs e)
+    {
+        if (PlayerController.LocalInstance != null)
+        {
+            //may duplicate base on event so need to unsubcribe first befor subcribe again
+            PlayerController.LocalInstance.OnSelectedCounterChanged -= PlayerController_OnSelectedCounterChanged;
+            PlayerController.LocalInstance.OnSelectedCounterChanged += PlayerController_OnSelectedCounterChanged;
+        }
     }
 
     private void PlayerController_OnSelectedCounterChanged(object sender, PlayerController.OnSelectedCounterChangedeventArgs e)

@@ -1,11 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class KitchenObject : MonoBehaviour
+public class KitchenObject : NetworkBehaviour
 {
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
     private IKitchenObjectParent kitchenObjectParent;
+    private FollowTransform followTransform;
+
+    protected virtual void Awake()
+    {
+        followTransform = GetComponent<FollowTransform>();
+    }
 
     public KitchenObjectSO GetKitchenObjectSO()
     {
@@ -14,6 +21,23 @@ public class KitchenObject : MonoBehaviour
 
     public void SetKitchenObjectParent(IKitchenObjectParent kitchenObjectParent)
     {
+        SetKitchenObjectParentServerRpc(kitchenObjectParent.GetNetworkObject());
+        // transform.parent = kitchenObjectParent.GetKitchenObjecFollowTransform();
+        // transform.localPosition = Vector3.zero; // Reset position to the counter's top point
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetKitchenObjectParentServerRpc(NetworkObjectReference kitchenObjectParentNetworkObjectReference)
+    {
+        SetKitchenObjectParentClientRpc(kitchenObjectParentNetworkObjectReference);
+    }
+
+    [ClientRpc]
+    private void SetKitchenObjectParentClientRpc(NetworkObjectReference kitchenObjectParentNetworkObjectReference)
+    {
+        kitchenObjectParentNetworkObjectReference.TryGet(out NetworkObject kitchenObjectParentNetworkObject);
+        IKitchenObjectParent kitchenObjectParent = kitchenObjectParentNetworkObject.GetComponent<IKitchenObjectParent>();
+
         if (this.kitchenObjectParent != null)
         {
             this.kitchenObjectParent.ClearKitchenObject();
@@ -29,8 +53,9 @@ public class KitchenObject : MonoBehaviour
         }
         kitchenObjectParent.SetKitchenObject(this);
 
-        transform.parent = kitchenObjectParent.GetKitchenObjecFollowTransform();
-        transform.localPosition = Vector3.zero; // Reset position to the counter's top point
+
+        //because Unity Netcode dont support parent set NetworkObject
+        followTransform.SetTargetTransform(kitchenObjectParent.GetKitchenObjecFollowTransform());
     }
 
     public IKitchenObjectParent GetKitchenObjectParent()
@@ -40,19 +65,13 @@ public class KitchenObject : MonoBehaviour
 
     public void DestroySelf()
     {
-        kitchenObjectParent.ClearKitchenObject();
         Destroy(gameObject);
     }
 
-    public static KitchenObject SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
+    public void ClearKitchenObjectParent()
     {
-        Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab);
-        KitchenObject kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-        kitchenObject.SetKitchenObjectParent(kitchenObjectParent);
-
-        return kitchenObject;
+        kitchenObjectParent.ClearKitchenObject();
     }
-
     public bool TryGetPlate(out PlateKitchenObject plateKitchenObject)
     {
         if (this is PlateKitchenObject)
@@ -65,5 +84,16 @@ public class KitchenObject : MonoBehaviour
             plateKitchenObject = null;
             return false;
         }
+    }
+
+    public static void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
+    {
+        KitchenGameMultiplayer.Instance.SpawnKitchenObject(kitchenObjectSO, kitchenObjectParent);
+
+    }
+
+    public static void DestroyKitchenObject(KitchenObject kitchenObject)
+    {
+        KitchenGameMultiplayer.Instance.DestroyKitchenObject(kitchenObject);
     }
 }

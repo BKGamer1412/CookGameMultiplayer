@@ -6,35 +6,35 @@ using UnityEngine.UI;
 public class OptionsUI : MonoBehaviour
 {
     public static OptionsUI Instance { get; private set; }
-    [SerializeField] Slider musicVolumeSlider;
-    [SerializeField] Slider sfxVolumeSlider;
-    [SerializeField] TextMeshProUGUI sfxVolumePercentage;
-    [SerializeField] TextMeshProUGUI musicVolumePercentage;
-    [SerializeField] Button returnButton;
+    [SerializeField] private Slider musicVolumeSlider;
+    [SerializeField] private Slider sfxVolumeSlider;
+    [SerializeField] private TextMeshProUGUI sfxVolumePercentage;
+    [SerializeField] private TextMeshProUGUI musicVolumePercentage;
+    [SerializeField] private Button returnButton;
 
 
-    [SerializeField] Button moveUpButton;
-    [SerializeField] Button moveDownButton;
-    [SerializeField] Button moveLeftButton;
-    [SerializeField] Button moveRightButton;
-    [SerializeField] Button interactButton;
-    [SerializeField] Button interactAltButton;
-    [SerializeField] Button pauseButton;
-    [SerializeField] Button gamepad_InteractButton;
-    [SerializeField] Button gamepad_InteractAltButton;
-    [SerializeField] Button gamepad_PauseButton;
-    [SerializeField] TextMeshProUGUI moveUpText;
-    [SerializeField] TextMeshProUGUI moveDownText;
-    [SerializeField] TextMeshProUGUI moveLeftText;
-    [SerializeField] TextMeshProUGUI moveRightText;
-    [SerializeField] TextMeshProUGUI interactText;
-    [SerializeField] TextMeshProUGUI interactAltText;
-    [SerializeField] TextMeshProUGUI pauseText;
-    [SerializeField] TextMeshProUGUI gamepad_InteractText;
-    [SerializeField] TextMeshProUGUI gamepad_InteractAltText;
-    [SerializeField] TextMeshProUGUI gamepad_PauseText;
+    [SerializeField] private Button moveUpButton;
+    [SerializeField] private Button moveDownButton;
+    [SerializeField] private Button moveLeftButton;
+    [SerializeField] private Button moveRightButton;
+    [SerializeField] private Button interactButton;
+    [SerializeField] private Button interactAltButton;
+    [SerializeField] private Button pauseButton;
+    [SerializeField] private Button gamepad_InteractButton;
+    [SerializeField] private Button gamepad_InteractAltButton;
+    [SerializeField] private Button gamepad_PauseButton;
+    [SerializeField] private TextMeshProUGUI moveUpText;
+    [SerializeField] private TextMeshProUGUI moveDownText;
+    [SerializeField] private TextMeshProUGUI moveLeftText;
+    [SerializeField] private TextMeshProUGUI moveRightText;
+    [SerializeField] private TextMeshProUGUI interactText;
+    [SerializeField] private TextMeshProUGUI interactAltText;
+    [SerializeField] private TextMeshProUGUI pauseText;
+    [SerializeField] private TextMeshProUGUI gamepad_InteractText;
+    [SerializeField] private TextMeshProUGUI gamepad_InteractAltText;
+    [SerializeField] private TextMeshProUGUI gamepad_PauseText;
 
-    [SerializeField] Transform pressToRebindKeyTransform;
+    [SerializeField] private Transform pressToRebindKeyTransform;
 
     private Action OnReturnButtonAction;
 
@@ -67,7 +67,7 @@ public class OptionsUI : MonoBehaviour
     {
         sfxVolumeSlider.value = SoundManager.Instance.GetVolume();
         musicVolumeSlider.value = MusicManager.Instance.GetVolume();
-        KitchenGameManager.Instance.OnGameUnPause += KitchenGameManager_OnGameUnPause;
+        KitchenGameManager.Instance.OnLocalGameUnPaused += KitchenGameManager_OnLocalGameUnPause;
 
         UpdateVisual();
         HidePressToRebindKey();
@@ -89,7 +89,7 @@ public class OptionsUI : MonoBehaviour
     }
 
 
-    private void KitchenGameManager_OnGameUnPause(object sender, EventArgs e)
+    private void KitchenGameManager_OnLocalGameUnPause(object sender, EventArgs e)
     {
         //hide when player press esc
         Hide();

@@ -6,7 +6,7 @@ using UnityEngine;
 public class StoveBurnWarningBarUI : MonoBehaviour
 {
     private const string IS_FLASHING = "IsFlashing";
-    [SerializeField] StoveCounter stoveCounter;
+    [SerializeField] private StoveCounter stoveCounter;
     private Animator stoveBurnWarningAnim;
 
     private void Awake()

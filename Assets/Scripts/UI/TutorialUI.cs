@@ -6,28 +6,29 @@ using UnityEngine;
 
 public class TutorialUI : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI keyMoveUpText;
-    [SerializeField] TextMeshProUGUI keyMoveDownText;
-    [SerializeField] TextMeshProUGUI keyMoveLeftText;
-    [SerializeField] TextMeshProUGUI keyMoveRightText;
-    [SerializeField] TextMeshProUGUI keyInteractText;
-    [SerializeField] TextMeshProUGUI keyInteractAltText;
-    [SerializeField] TextMeshProUGUI keyPauseText;
-    [SerializeField] TextMeshProUGUI keyGamepad_InteractText;
-    [SerializeField] TextMeshProUGUI keyGamepad_InteractAltText;
-    [SerializeField] TextMeshProUGUI keyGamepad_PauseText;
+    [SerializeField] private TextMeshProUGUI keyMoveUpText;
+    [SerializeField] private TextMeshProUGUI keyMoveDownText;
+    [SerializeField] private TextMeshProUGUI keyMoveLeftText;
+    [SerializeField] private TextMeshProUGUI keyMoveRightText;
+    [SerializeField] private TextMeshProUGUI keyInteractText;
+    [SerializeField] private TextMeshProUGUI keyInteractAltText;
+    [SerializeField] private TextMeshProUGUI keyPauseText;
+    [SerializeField] private TextMeshProUGUI keyGamepad_InteractText;
+    [SerializeField] private TextMeshProUGUI keyGamepad_InteractAltText;
+    [SerializeField] private TextMeshProUGUI keyGamepad_PauseText;
 
     private void Start()
     {
         GameInput.Instance.OnBindingRebind += GameInput_OnBindingRebind;
-        KitchenGameManager.Instance.OnStateChanged += KitchenGameManager_OnStateChanged;
-        Show();
+        KitchenGameManager.Instance.OnLocalPlayerReadyChanged += KitchenGameManager_OnLocalPlayerReadyChanged;
+
         UpdateVisual();
+        Show();
     }
 
-    private void KitchenGameManager_OnStateChanged(object sender, EventArgs e)
+    private void KitchenGameManager_OnLocalPlayerReadyChanged(object sender, EventArgs e)
     {
-        if (KitchenGameManager.Instance.IsCountdownStartActive())
+        if (KitchenGameManager.Instance.IsLocalPlayerReady())
         {
             Hide();
         }
