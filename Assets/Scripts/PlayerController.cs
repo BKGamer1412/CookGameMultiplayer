@@ -25,7 +25,8 @@ public class PlayerController : NetworkBehaviour, IKitchenObjectParent
     [SerializeField] private LayerMask counterLayerMask;
     [SerializeField] private LayerMask collisionLayerMask;
     [SerializeField] private Transform kitchenObjectHoldPoint;
-    [SerializeField] private List<Vector3> playerSpawnPosition;
+    [SerializeField] private List<Vector3> playerSpawnPositionList;
+    [SerializeField] private PlayerVisual playerVisual;
 
     private bool isWalking;
     private Vector3 lastInteractDirection;
@@ -40,10 +41,13 @@ public class PlayerController : NetworkBehaviour, IKitchenObjectParent
     {
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
         GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+
+        PlayerData playerData = KitchenGameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        playerVisual.SetPlayerColor(KitchenGameMultiplayer.Instance.GetPlayerColor(playerData.colorId));
     }
 
 
-    //new (this same as Start and Awaken method but for netcode multiplayer)
+    //(this same as Start and Awaken method but for netcode multiplayer)
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -52,7 +56,7 @@ public class PlayerController : NetworkBehaviour, IKitchenObjectParent
         }
 
         //player spawn position
-        transform.position = playerSpawnPosition[(int)OwnerClientId];
+        transform.position = playerSpawnPositionList[KitchenGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId)];
 
         OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
 

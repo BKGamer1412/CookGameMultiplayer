@@ -15,7 +15,8 @@ public class GameOverUI : MonoBehaviour
     {
         playAgainButton.onClick.AddListener(() =>
         {
-            Loader.LoadNetwork(Loader.Scene.GameScene);
+            NetworkManager.Singleton.Shutdown();
+            Loader.Load(Loader.Scene.MainMenuScene);
         });
     }
     private void Start()

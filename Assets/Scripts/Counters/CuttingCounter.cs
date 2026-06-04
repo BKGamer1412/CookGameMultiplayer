@@ -90,21 +90,17 @@ public class CuttingCounter : BaseCounter, IHasProgress
 
     public override void InteractAlternate(PlayerController player)
     {
-        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
-        {
-            CutObjectServerRpc();
-            TestCuttingProgressServerRpc();
-        }
-        else
-        {
-            //there is no KitchenObject here
-        }
+        CutObjectServerRpc();
+        TestCuttingProgressServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void CutObjectServerRpc()
     {
-        CutObjectClientRpc();
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
+        {
+            CutObjectClientRpc();
+        }
     }
 
     [ClientRpc]
@@ -134,15 +130,19 @@ public class CuttingCounter : BaseCounter, IHasProgress
     [ServerRpc(RequireOwnership = false)]
     private void TestCuttingProgressServerRpc()
     {
-        CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(GetKitchenObject().GetKitchenObjectSO());
-        if (cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
         {
-            KitchenObjectSO kitchenObjectOutput = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
+            CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(GetKitchenObject().GetKitchenObjectSO());
+            if (cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
+            {
+                KitchenObjectSO kitchenObjectOutput = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
 
-            // GetKitchenObject().DestroySelf();
-            KitchenObject.DestroyKitchenObject(GetKitchenObject());
-            KitchenObject.SpawnKitchenObject(kitchenObjectOutput, this);
+                // GetKitchenObject().DestroySelf();
+                KitchenObject.DestroyKitchenObject(GetKitchenObject());
+                KitchenObject.SpawnKitchenObject(kitchenObjectOutput, this);
+            }
         }
+        
     }
 
     private bool HasRecipeWithInput(KitchenObjectSO inputKitchenObjectSO)
